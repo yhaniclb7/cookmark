@@ -1,7 +1,9 @@
-{
-  "buildCommand": "npm install && npm run build",
-  "startCommand": "npm start",
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
+services:
+  - type: web
+    name: cookmark
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
