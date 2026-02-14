@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CookMark
 
-## Getting Started
+**Clean Recipes, Zero Bloat.**
 
-First, run the development server:
+Convert recipe websites to clean Markdown instantly. No ads, no life stories, just ingredients and instructions.
+
+## Problem
+
+Modern recipe websites are bloated with:
+- Endless scroll of ads
+- "My grandmother's story about this dish..."
+- Auto-playing videos
+- Newsletter popups
+- Cookie consent banners
+
+People just want the recipe.
+
+## Solution
+
+CookMark extracts recipe content from any URL and converts it to clean, readable Markdown that you can:
+- Save to your notes app (Obsidian, Notion, Logseq)
+- Print without wasting ink
+- Read without distractions
+- Store offline forever
+
+## Features
+
+- 🍳 **One-click extraction** - Paste any recipe URL
+- 📝 **Clean Markdown output** - No ads, no stories
+- 💾 **Download as .md file** - Keep recipes forever
+- 📋 **Copy to clipboard** - Quick paste into your notes
+- 🔒 **Privacy-focused** - No tracking, no analytics
+- 🚀 **Fast** - Built with Next.js and deployed on serverless
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS + Typography plugin
+- jsdom + Turndown (for extraction)
+- React Markdown
+
+## Deployment
+
+This app is designed to deploy seamlessly to Vercel:
+
+1. Fork/clone this repo
+2. Connect to Vercel
+3. Deploy
+
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+POST /api/extract
+Content-Type: application/json
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+{
+  "url": "https://example.com/recipe"
+}
+```
 
-## Learn More
+Response:
+```json
+{
+  "title": "Recipe Title",
+  "markdown": "# Recipe Title\n\nIngredients..."
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Monetization Strategy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Freemium Model**
+   - Free: 10 extractions/day
+   - Pro ($5/month): Unlimited extractions, Chrome extension, meal planning
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Chrome Extension** (future)
+   - One-click extraction from any recipe site
 
-## Deploy on Vercel
+3. **Meal Planning Integration** (future)
+   - Export to grocery lists
+   - Weekly meal planner
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Market
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Based on Reddit research:
+- 640+ posts asking for offline-first/local-only tools
+- High frustration with "subscription fatigue"
+- Recipe sites rated among the worst ad experiences
+- Strong interest in markdown-based workflows
+
+## License
+
+MIT
