@@ -7,14 +7,25 @@ import { Download, Utensils, Loader2, Clipboard, Github } from 'lucide-react';
 export default function Home() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Extracting...');
   const [recipe, setRecipe] = useState<{ title: string; markdown: string } | null>(null);
   const [error, setError] = useState('');
 
   const handleExtract = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLoadingMessage('Fetching page...');
     setError('');
-    setRecipe(null);
+    
+    // Simulate progressive loading messages
+    const messages = ['Analyzing structure...', 'Extracting ingredients...', 'Cleaning up bloat...', 'Generating Markdown...'];
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < messages.length) {
+        setLoadingMessage(messages[i]);
+        i++;
+      }
+    }, 800);
 
     try {
       const res = await fetch('/api/extract', {
@@ -30,6 +41,7 @@ export default function Home() {
     } catch (err: any) {
       setError(err.message);
     } finally {
+      clearInterval(interval);
       setLoading(false);
     }
   };
@@ -84,9 +96,14 @@ export default function Home() {
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 min-w-[140px]"
+            className="px-8 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 min-w-[200px]"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Extract'}
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>{loadingMessage}</span>
+              </>
+            ) : 'Extract Recipe'}
           </button>
         </form>
 

@@ -24,24 +24,53 @@ export async function POST(req: NextRequest) {
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
-    // Basic heuristic for recipe extraction
-    // Look for common recipe schema or structures
-    const title = doc.querySelector('h1')?.textContent?.trim() || 'Recipe';
-    
-    // Attempt to find the main content area
-    const body = doc.body;
-    
-    // Remove unwanted elements
-    const selectorsToRemove = [
-      'header', 'footer', 'nav', 'aside', 'script', 'style', 'iframe', 'ads', '.ads', '#ads',
-      '.sidebar', '.comment', '.footer', '.header', '.menu', '.social-share'
-    ];
-    selectorsToRemove.forEach(s => {
-      body.querySelectorAll(s).forEach(el => el.remove());
+    let recipeData: any = null;
+
+    // Try to find JSON-LD
+    const jsonLdScripts = doc.querySelectorAll('script[type="application/ld+json"]');
+    jsonLdScripts.forEach(script => {
+      try {
+        const data = JSON.parse(script.textContent || '');
+        const findRecipe = (obj: any): any => {
+          if (obj['@type'] === 'Recipe') return obj;
+          if (obj['@graph']) return obj['@graph'].find((item: any) => item['@type'] === 'Recipe');
+          return null;
+        };
+        const found = Array.isArray(data) ? data.find(findRecipe) : findRecipe(data);
+        if (found) recipeData = found;
+      } catch (e) {}
     });
 
+    let title = '';
+    let markdown = '';
     const turndownService = new TurndownService();
-    const markdown = turndownService.turndown(body.innerHTML);
+
+    if (recipeData) {
+      title = recipeData.name;
+      const ingredients = Array.isArray(recipeData.recipeIngredient) 
+        ? recipeData.recipeIngredient.map((i: string) => `- ${i}`).join('\n')
+        : '';
+      
+      let instructions = '';
+      if (Array.isArray(recipeData.recipeInstructions)) {
+        instructions = recipeData.recipeInstructions.map((step: any) => {
+          if (typeof step === 'string') return step;
+          return step.text || step.name || '';
+        }).join('\n\n');
+      }
+
+      markdown = `# ${title}\n\n## Ingredients\n${ingredients}\n\n## Instructions\n${instructions}`;
+    } else {
+      // Fallback to heuristic
+      title = doc.querySelector('h1')?.textContent?.trim() || 'Recipe';
+      const body = doc.body;
+      const selectorsToRemove = [
+        'header', 'footer', 'nav', 'aside', 'script', 'style', 'iframe', 'ads', '.ads', '#ads',
+        '.sidebar', '.comment', '.footer', '.header', '.menu', '.social-share'
+      ];
+      selectorsToRemove.forEach(s => body.querySelectorAll(s).forEach(el => el.remove()));
+      markdown = turndownService.turndown(body.innerHTML);
+    }
 
     return NextResponse.json({ title, markdown });
   } catch (error: any) {
